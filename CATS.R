@@ -1,6 +1,8 @@
 library('caret')
 library(tidyverse)
 
+
+
 ### 1. LOADING THE DATA
 setwd('/home/villelehtonen/CATS')
 train_call <- read.delim('Train_call.txt', header = TRUE, sep = "\t",
@@ -11,12 +13,13 @@ train_clinical <- read.delim('Train_clinical.txt', header = TRUE, sep = "\t",
                              quote = "\"", dec = ".", fill = TRUE,
                              comment.char = "")
 
-
 #inspect raw data
 dim(train_call)
 dim(train_clinical)
 head(train_call[,1:20])
 head(train_clinical)
+
+
 
 ### 2. PROCESSING THE DATA
 #transform to data frame, remove irrelevant columns, and transpose
@@ -41,6 +44,8 @@ dim(df_call)
 dim(df_merged)
 head(df_merged[,1:10])
 
+
+
 #### 3. Feature selection
 #inspect features that distinct the clinical outcomes best
 outcomes <- factor(as.vector(df_merged$Subgroup))
@@ -59,3 +64,16 @@ head(rocVarImp)
 #sort by importance
 rocVarImp <- rocVarImp[order(-rocVarImp$importance),]
 head(rocVarImp)
+
+#perform a t-test
+t.test(rocVarImp$importance)
+#-> mean: 0.5905131
+#-> 95% confidence interval 0.5886747 - 0.5923516
+
+#filter variables outside confidence interval
+rocVarImp_filtered <- rocVarImp[rocVarImp$importance > 0.5886747,]
+
+
+
+### 4. Training the classifier
+
