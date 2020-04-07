@@ -65,15 +65,38 @@ head(rocVarImp)
 rocVarImp <- rocVarImp[order(-rocVarImp$importance),]
 head(rocVarImp)
 
-#perform a t-test
-t.test(rocVarImp$importance)
-#-> mean: 0.5905131
-#-> 95% confidence interval 0.5886747 - 0.5923516
+#Choose top 100 variables
+rocVarImp_filtered <- rocVarImp[c(1:100),]
 
-#filter variables outside confidence interval
-rocVarImp_filtered <- rocVarImp[rocVarImp$importance > 0.5886747,]
+head(rocVarImp_filtered)
+dim(rocVarImp_filtered)
 
+#filter the variables from the original data
+df_features_selected <- df_merged_filtered[, rownames(rocVarImp_filtered)]
+head(df_features_selected[,1:10])
 
+subgroups <- df_merged["Subgroup"]
+head(subgroups)
+
+df_final <- merge(subgroups, df_features_selected, by = "row.names")
+rownames(df_final) <- df_final$Row.names
+df_final$Row.names <- NULL
+
+dim(df_final)
+head(df_final[,1:5])
 
 ### 4. Training the classifier
 
+#Train a classifier
+TrainData <- df_final[, 2:101]
+TrainClasses <- df_final[, 1]
+ctrl <- trainControl(method = "cv")
+
+knnFit <- train(TrainData, TrainClasses,
+                method = "knn",
+                preProcess = c("center", "scale"),
+                tuneLength = 10,
+                trControl = ctrl)
+
+
+### 5. Making predictions
