@@ -98,3 +98,39 @@ knnFit <- train(TrainData, TrainClasses,
 
 
 ### 5. Making predictions
+# best performing classification model, k=23
+
+#Read validation samples
+validation_samples <- read.delim('.txt', header = TRUE, sep = "\t",
+                                 quote = "\"", dec = ".", fill = TRUE,
+                                 comment.char = "")
+
+#Preprocess data
+df_validation <- t(as.data.frame(validation_samples[,-(1:4), drop=FALSE]))
+
+#Select n features
+df_validation_filtered <- df_validation_filtered[, rownames(rocVarImp_filtered)]
+
+
+#Use predict function to generate a vector of class predictions
+Output <- predict(knnFit, newdata = df_validation_filtered)
+
+
+
+### 6. Generating output
+#Create a data frame from the sample names and the predictions
+
+
+#Use write.table() to write the results to a .txt file
+write.table(Output,
+            "myPredictions.txt",
+            sep="_",
+            row.names = FALSE)
+
+
+
+
+
+
+
+
