@@ -44,8 +44,6 @@ dim(df_call)
 dim(df_merged)
 head(df_merged[,1:10])
 
-
-
 #### 3. Feature selection
 #inspect features that distinct the clinical outcomes best
 outcomes <- factor(as.vector(df_merged$Subgroup))
@@ -65,8 +63,8 @@ head(rocVarImp)
 rocVarImp <- rocVarImp[order(-rocVarImp$importance),]
 head(rocVarImp)
 
-#Choose top 100 variables
-rocVarImp_filtered <- rocVarImp[c(1:100),]
+#Choose top 20 variables
+rocVarImp_filtered <- rocVarImp[c(1:20),]
 
 head(rocVarImp_filtered)
 dim(rocVarImp_filtered)
@@ -88,13 +86,13 @@ head(df_final[,1:5])
 ### 4. Training the classifier
 
 #Train a classifier
-TrainData <- df_final[, 2:101]
+TrainData <- df_final[, 2:21]
 TrainClasses <- df_final[, 1]
-ctrl <- trainControl(method = "cv")
+ctrl <- trainControl(method = "repeatedcv",
+                     repeats = 10)
 
 knnFit <- train(TrainData, TrainClasses,
                 method = "knn",
-                preProcess = c("center", "scale"),
                 tuneLength = 10,
                 trControl = ctrl)
 
